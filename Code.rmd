@@ -66,3 +66,19 @@ gym = gym %>%
 
 ```
 
+#creates a boxplot to comapre BMI's of Age Groups
+```{r boxplot of age group and BMI}
+
+#code to create an interactive plot for the Age group V. BMI
+B1 <- ggplot(data = gym, aes(x = Group, y = BMI, fill = Group)) +
+  geom_boxplot() +
+  labs(title = "Age Group vs. BMI", x = "Age Group") +
+  theme_minimal()
+
+#makes the graph interactive
+B1 <- ggplotly(B1)
+
+#plots the graph
+B1
+
+```
