@@ -87,7 +87,7 @@ B1
 ``` {r}
 library(ggridges)
 
-ggplot(gym, aes(x = Calories_Burned, y = Group, fill = stat(quantile)))+
+ggplot(gym, aes(x = Calories_Burned, y = Group, fill = after_stat(quantile)))+
   stat_density_ridges(quantile_lines = FALSE,
                       calc_ecdf = TRUE,
                       geom = "density_ridges_gradient",
