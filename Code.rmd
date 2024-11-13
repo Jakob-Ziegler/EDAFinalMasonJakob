@@ -95,3 +95,41 @@ ggplot(gym, aes(x = Calories_Burned, y = Group, fill = after_stat(quantile)))+
   scale_fill_manual(name = "Probability", values = c("#E2FFF2", "white", "#B0E0E6"),
                     labels = c("(0, 5%]", "(5%, 95%]", "(95%, 1]"))
 ```
+
+- What Workout Types are Optimal for Burning Calories?
+```{r optimal workouts}
+
+# Get Summary data to display the average of calories burned for workout type
+averages <- gym %>%
+  group_by(Workout_Type) %>%
+  summarize(Average_Cal_Burned = mean(Calories_Burned))
+
+# Code to create lolipop chart that orders the workouts by higher calories burned
+lolipop <- ggplot(averages, aes(x = reorder(Workout_Type,-Average_Cal_Burned), y = Average_Cal_Burned)) +
+  geom_segment(aes(x = reorder(Workout_Type,-Average_Cal_Burned), 
+                   xend = reorder(Workout_Type,-Average_Cal_Burned), 
+                   y = 0, yend = Average_Cal_Burned), lwd = 1.5, color = 'Grey') +
+    # Creates the lolipop and changes text that pops up when hovering over the lolipops
+    # Also changes the color of the lolipop to correlate with workout type
+    geom_point(
+      aes(color = Workout_Type,
+          text = paste(
+          "Workout Type: ", Workout_Type,
+          "\nAverage Calories Burned: ", round(Average_Cal_Burned, 1)
+        )),
+        size = 5) +
+    labs(
+        title = "Average Calories Burned by Workout Type",
+        x = "",
+        y = "Average Calories Burned",
+        ) +
+        coord_flip() +
+        theme_minimal() +
+          theme(legend.position = "none")
+
+# Makes plot interactive
+lolipop <- ggplotly(lolipop, tooltip = "text")
+lolipop
+
+
+```
