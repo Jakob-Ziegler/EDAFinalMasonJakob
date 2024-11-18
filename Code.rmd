@@ -65,7 +65,7 @@ gym = gym %>%
   ))
 
 ```
-
+- Stage 1: EDA 
 #creates a boxplot to comapre BMI's of Age Groups
 ```{r boxplot of age group and BMI}
 
@@ -95,6 +95,9 @@ ggplot(gym, aes(x = Calories_Burned, y = Group, fill = after_stat(quantile)))+
   scale_fill_manual(name = "Probability", values = c("#E2FFF2", "white", "#B0E0E6"),
                     labels = c("(0, 5%]", "(5%, 95%]", "(95%, 1]"))
 ```
+-  Stage2: Looking to find what is the best formula for a new gym goer to follow:
+    -   Weight loss optimization, what works best?
+    -   Duration, Workout Type, Water Intake, etc
 
 - What Workout Types are Optimal for Burning Calories?
 ```{r optimal workouts}
