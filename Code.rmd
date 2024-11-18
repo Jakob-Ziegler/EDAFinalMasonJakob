@@ -136,3 +136,49 @@ lolipop
 
 
 ```
+
+- Optimal Frequency Based on Experience level, and BMI 
+  1 is the lowest, 3 is the highest for Experience level (edit these text chunks later)
+
+```{r}
+# Want to look at a lifter who has experience in the gym to see 
+# How many days a week they lift and compare to their BMI/Fat%
+# Pull in library for sake of comparison
+library(patchwork)
+
+# Group gym by experience 
+exp_level <- gym %>%
+  group_by(Experience_Level) %>%
+  select(BMI, `Workout_Frequency (days/week)`)
+
+
+#Set to a Factor so they will be grouped separately
+exp_level$Experience_Level <- as.factor(exp_level$Experience_Level)
+exp_level$`Workout_Frequency (days/week)` <- as.factor(exp_level$`Workout_Frequency (days/week)`)
+
+
+# Creating a violin plot to show distribution of experience level and BMI levels
+violin1 <- ggplot(exp_level, aes(x = Experience_Level, y = BMI)) +
+  geom_violin(trim = FALSE, aes(fill = Experience_Level),alpha = 0.8) +
+  scale_color_gradient(low = "Blue", high = "Red") +
+    labs(
+      title = "Comparing Experience Level and Workout Frequency",
+      x = "Experience Level"
+    ) +
+  theme(legend.position = "FALSE") 
+
+
+# Create a stacked bar plot for the sake of comparison
+bar1 <- ggplot(exp_level, aes(x = `Workout_Frequency (days/week)`, fill = Experience_Level)) +
+  geom_bar(alpha = 0.8, color = "Black") +
+  guides(fill = guide_legend(title = "Experience Level")) + 
+    labs(
+      x = "Workout Frequency (Days per Week)",
+      y = "Count"
+    ) 
+
+
+# Using patchwork library to make the graphs be side by side for comparison
+comparison <- violin1 + bar1
+comparison
+```
