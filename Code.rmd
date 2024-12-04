@@ -212,3 +212,23 @@ ggplot(gym, aes(x = Group_WGT, y = `Water_Intake (ounces)`, fill = Group_WGT)) +
        y = "Water Intake (ounces)") +
   theme_minimal()
 ```
+
+# Boxplots for Gender
+```{r}
+
+ggplot(gym, aes(x = Gender, y = `Session_Duration (mins)`, fill = Gender)) +
+  geom_boxplot(alpha = 0.7) +
+  labs(title = "Session Duration by Gender",
+       x = "Gender",
+       y = "Session Duration (mins)") +
+  theme_minimal()
+
+
+ggplot(gym, aes(x = Gender, y = Calories_Burned, fill = Gender)) +
+  geom_boxplot(alpha = 0.7) +
+  labs(title = "Calories Burned by Gender",
+       x = "Gender",
+       y = "Calories Burned") +
+  theme_minimal()
+
+```
