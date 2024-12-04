@@ -124,6 +124,22 @@ ggplot(gym, aes(x = Calories_Burned)) +
 
 ```
 
+# Facet Wrap Scatter Plots
+``` {r}
+
+ggplot(gym, aes(x = `Session_Duration (mins)`, y = Calories_Burned)) +
+  geom_point(alpha = 0.5, aes(color = as.factor(Experience_Level))) +
+  facet_wrap(~Workout_Type, scales = "free") +
+  labs(
+    title = "Calories Burned vs. Session Duration by Workout Type",
+    x = "Session Duration (mins)",
+    y = "Calories Burned",
+    color = "Experience Level"
+  ) +
+  theme_minimal() +
+  theme(legend.position = "right")
+```
+
 - Part 2: How Can A New Gym Member Become Healthy Optimally?
 
   - Looking to find the best formula for a new gym goer to follow:
