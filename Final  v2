@@ -107,6 +107,24 @@ ggplot(gym, aes(x = Gender, y = BMI, fill = Gender)) +
 
 ```
 
+# Barplot of Water Intake by Gender
+``` {r}
+
+gym2 <- gym %>%
+  group_by(Gender) %>%
+  summarise(Average_Water_Intake = mean(`Water_Intake (ounces)`, na.rm = TRUE))
+
+ggplot(gym2, aes(x = Gender, y = Average_Water_Intake, fill = Gender)) +
+  geom_bar(stat = "identity", alpha = 0.8) +
+  labs(
+    title = "Average Water Intake by Gender",
+    x = "Gender",
+    y = "Average Water Intake (ounces)"
+  ) +
+  scale_fill_manual(values = c("pink", "blue")) +
+  theme_minimal()
+```
+
 # Facet Wrap Scatter Plots
 ``` {r}
 
