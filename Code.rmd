@@ -125,6 +125,20 @@ lolipop
 
 ```
 
+# Scatter Plot for Session Duration and Calories Burned
+```{r}
+
+ggplot(gym, aes(x = `Session_Duration (mins)`, y = Calories_Burned, color = as.factor(Experience_Level))) +
+  geom_point(alpha = 0.5) +  # Add scatter points
+  geom_smooth(method = "loess", se = TRUE, color = "blue") +
+  labs(title = "Calories Burned vs. Workout Duration",
+       x = "Session Duration (mins)",
+       y = "Calories Burned",
+       color = "Experience Level") +
+  theme_minimal()
+
+```
+
 - Optimal Frequency Based on Experience level, and BMI 
   1 is the lowest, 3 is the highest for Experience level (edit these text chunks later)
 
