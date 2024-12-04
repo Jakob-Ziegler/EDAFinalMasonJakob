@@ -97,33 +97,6 @@ ggplot(gym, aes(x = BMI)) +
 
 ```
 
-
-- Distribution of Duration in the Data
-
-```{r Workout Duration Distribution, message=FALSE, warning=FALSE}
-ggplot(gym, aes(x = `Session_Duration (mins)`)) +
-  geom_density(color = 4, fill = 4, lwd = 1, alpha = 0.7) +
-  labs( 
-    title = "Distribution of Session Duration (mins)",
-    x = "Session Duration (mins)"
-    ) +
-  theme_minimal()
-
-```
-- Distribution of Calories Burned in the Data
-
-```{r Workout Calories Burned Distribution, message=FALSE, warning=FALSE}
-
-ggplot(gym, aes(x = Calories_Burned)) +
-  geom_density(color = 3, fill = 3, lwd = 1, alpha = 0.7) +
-  labs( 
-    title = "Distribution of Calories Burned",
-    x = "Calories Burned"
-    ) +
-  theme_minimal()
-
-```
-
 # Facet Wrap Scatter Plots
 ``` {r}
 
