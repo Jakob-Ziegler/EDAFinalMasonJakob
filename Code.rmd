@@ -185,32 +185,22 @@ comparison <- violin1 + bar1
 comparison
 ```
 
-# Boxplots of Water Intake by Groups
-``` {r}
-
-# Gender
-ggplot(gym, aes(x = Gender, y = `Water_Intake (ounces)`, fill = Gender)) +
-  geom_boxplot(alpha = 0.7) +
-  labs(title = "Water Intake by Gender",
-       x = "Gender",
-       y = "Water Intake (ounces)") +
+# Water Intake by Fat %
+```{r}
+library(plotly)
+p = gym %>%
+  mutate(Water_Group = cut(`Water_Intake (ounces)`, breaks = c(50, 75, 100, 125, Inf), 
+                           labels = c("Low (50 - 75 (oz))", "Medium (75 - 100 (oz))", "High (100 - 125 (oz))", "Very High (125+ (oz))"))) %>%
+  ggplot(aes(x = Water_Group, y = Fat_Percentage, fill = Water_Group)) +
+  geom_boxplot() +
+  labs(title = "Fat Percentage by Water Intake Group",
+       x = "Water Intake Group (ounces)",
+       y = "Fat Percentage (%)") +
   theme_minimal()
 
-# Age Group
-ggplot(gym, aes(x = Group, y = `Water_Intake (ounces)`, fill = Group)) +
-  geom_boxplot(alpha = 0.7) +
-  labs(title = "Water Intake by Age Group",
-       x = "Age Group",
-       y = "Water Intake (ounces)") +
-  theme_minimal()
+p = ggplotly(p, tooltip = "text")
+p
 
-# Weight Group
-ggplot(gym, aes(x = Group_WGT, y = `Water_Intake (ounces)`, fill = Group_WGT)) +
-  geom_boxplot(alpha = 0.7) +
-  labs(title = "Water Intake by Weight Group",
-       x = "Weight Group",
-       y = "Water Intake (ounces)") +
-  theme_minimal()
 ```
 
 # Boxplots for Gender
