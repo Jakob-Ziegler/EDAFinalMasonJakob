@@ -94,6 +94,16 @@ ggplot(gym, aes(x = BMI)) +
   geom_density(lwd = 1, color = 4,
                fill = 4, alpha = 0.25)
     
+```
+
+# Boxplot of Gender and BMI
+``` {r}
+
+ggplot(gym, aes(x = Gender, y = BMI, fill = Gender)) + 
+  geom_boxplot() +
+  labs(title = "Boxplot of Gender vs BMI",
+       x = "Gender",
+       y = "BMI") 
 
 ```
 
