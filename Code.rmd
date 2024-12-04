@@ -125,19 +125,68 @@ lolipop
 
 ```
 
-# Scatter Plot for Session Duration and Calories Burned
+
+# Pie Chart for Workout Experience
 ```{r}
 
-ggplot(gym, aes(x = `Session_Duration (mins)`, y = Calories_Burned, color = as.factor(Experience_Level))) +
-  geom_point(alpha = 0.5) +  # Add scatter points
-  geom_smooth(method = "loess", se = TRUE, color = "blue") +
-  labs(title = "Calories Burned vs. Workout Duration",
-       x = "Session Duration (mins)",
-       y = "Calories Burned",
-       color = "Experience Level") +
-  theme_minimal()
+# Create a new dataset for level 1 experience
+exp1 <- gym %>%
+  filter(Experience_Level == 1) %>%
+  count(Workout_Type) %>%
+  mutate(percentage = n / sum(n) * 100, # Calculate percentage
+         label = paste0(Workout_Type, "\n(", round(percentage, 1), "%)"))
 
+# Pie chart for Experience Level 1
+ggplot(exp1, aes(x = "", y = n, fill = Workout_Type)) +
+  geom_bar(stat = "identity", width = 1) +
+  coord_polar(theta = "y") +
+  geom_text(aes(label = label), position = position_stack(vjust = 0.5), size = 4) +
+  labs(title = "Workout Preferences for Experience Level 1",
+       x = NULL, y = NULL, fill = "Workout Type") +
+  theme_minimal() +
+  theme(axis.text = element_blank(),
+        axis.ticks = element_blank(),
+        panel.grid = element_blank())
+
+# Create a new dataset for experience level 2
+exp2 <- gym %>%
+  filter(Experience_Level == 2) %>%
+  count(Workout_Type) %>%
+  mutate(percentage = n / sum(n) * 100, # Calculate percentage
+         label = paste0(Workout_Type, "\n(", round(percentage, 1), "%)"))
+
+# Pie chart for Experience Level 2
+ggplot(exp2, aes(x = "", y = n, fill = Workout_Type)) +
+  geom_bar(stat = "identity", width = 1) +
+  coord_polar(theta = "y") +
+  geom_text(aes(label = label), position = position_stack(vjust = 0.5), size = 4) +
+  labs(title = "Workout Preferences for Experience Level 2",
+       x = NULL, y = NULL, fill = "Workout Type") +
+  theme_minimal() +
+  theme(axis.text = element_blank(),
+        axis.ticks = element_blank(),
+        panel.grid = element_blank())
+
+# Create a new dataset for experience level 3
+exp3 <- gym %>%
+  filter(Experience_Level == 3) %>%
+  count(Workout_Type) %>%
+  mutate(percentage = n / sum(n) * 100, # Calculate percentage
+         label = paste0(Workout_Type, "\n(", round(percentage, 1), "%)"))
+
+# Pie chart for Experience Level 3
+ggplot(exp3, aes(x = "", y = n, fill = Workout_Type)) +
+  geom_bar(stat = "identity", width = 1) +
+  coord_polar(theta = "y") +
+  geom_text(aes(label = label), position = position_stack(vjust = 0.5), size = 4) +
+  labs(title = "Workout Preferences for Experience Level 3",
+       x = NULL, y = NULL, fill = "Workout Type") +
+  theme_minimal() +
+  theme(axis.text = element_blank(),
+        axis.ticks = element_blank(),
+        panel.grid = element_blank())
 ```
+
 
 - Optimal Frequency Based on Experience level, and BMI 
   1 is the lowest, 3 is the highest for Experience level (edit these text chunks later)
@@ -203,22 +252,3 @@ p
 
 ```
 
-# Boxplots for Gender
-```{r}
-
-ggplot(gym, aes(x = Gender, y = `Session_Duration (mins)`, fill = Gender)) +
-  geom_boxplot(alpha = 0.7) +
-  labs(title = "Session Duration by Gender",
-       x = "Gender",
-       y = "Session Duration (mins)") +
-  theme_minimal()
-
-
-ggplot(gym, aes(x = Gender, y = Calories_Burned, fill = Gender)) +
-  geom_boxplot(alpha = 0.7) +
-  labs(title = "Calories Burned by Gender",
-       x = "Gender",
-       y = "Calories Burned") +
-  theme_minimal()
-
-```
