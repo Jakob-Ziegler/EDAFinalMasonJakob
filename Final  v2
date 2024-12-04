@@ -1,0 +1,324 @@
+---
+title: "Final Project - Gym Data"
+author: "Jakob Ziegler and Mason Johnson"
+date: "2024-11-08"
+output: html_document
+self-contained: true 
+---
+
+
+- Introduction
+  - New member of the gym looking to get healthy
+  - Want to look at the data and determine how can 
+    we do this based on what others are doing 
+
+- Libraries used
+
+```{r libraries, message=FALSE, warning=FALSE}
+library(readr)          # used for reading in data
+library(dplyr)          # used in data pre-processing
+library(ggplot2)        # used for data visualization
+library(plotly)         # used to make visualizations interactive
+
+```
+
+- Data Reading 
+
+```{r data, message=FALSE, warning=FALSE}
+gym_members_exercise_tracking <- read_csv("gym_members_exercise_tracking.csv",show_col_types = FALSE)
+```
+
+- Pre-Processing
+
+```{r pre-processing, message=FALSE, warning=FALSE}
+#creates a new data frame that all further manipulations will be performed on
+gym = gym_members_exercise_tracking
+
+#converts the weight into pounds from kilograms 
+#renames it to "Weight (lbs)"
+gym = gym %>%
+  mutate(`Weight (kg)` = round(`Weight (kg)` * 2.20462, 1))
+gym = gym %>%
+  rename(`Weight (lbs)` = `Weight (kg)`)
+
+#converts the height into inches from meters 
+#renames it to "Height (in)"
+gym = gym %>% 
+  mutate(`Height (m)` = round(`Height (m)` * 39.3701, 1))
+gym = gym %>%
+  rename(`Height (in)` = `Height (m)`)
+
+#converts the gym session duration from hours to minutes
+#renames it to "Session_Duration (mins)"
+gym = gym %>%
+  mutate(`Session_Duration (hours)` = round(`Session_Duration (hours)` * 60, 2))
+gym = gym %>%
+  rename(`Session_Duration (mins)` = `Session_Duration (hours)`)
+
+#Converts water intake from liters to ounces
+#renames it to "Water_Intake (Ounces)"
+gym = gym %>%
+  mutate(`Water_Intake (liters)` = round(`Water_Intake (liters)` * 33.814, 1))
+gym = gym %>%
+  rename(`Water_Intake (ounces)` = `Water_Intake (liters)`)
+
+#adds 4 different age groups 
+gym = gym %>%
+  mutate(Group = case_when(
+    Age >= 18 & Age <= 29 ~ "18-29",
+    Age >= 30 & Age <= 39 ~ "30-39",
+    Age >= 40 & Age <= 49 ~ "40-49",
+    Age >= 50 & Age <= 59 ~ "50-59"
+  ))
+
+#adds 4 different weight groups 
+gym = gym %>%
+  mutate(Group_WGT = case_when(
+    `Weight (lbs)` >= 88 & `Weight (lbs)` <= 138 ~ "88 - 138",
+    `Weight (lbs)` >= 138.01 & `Weight (lbs)` <= 188 ~ "138 - 188",
+    `Weight (lbs)` >= 188.01 & `Weight (lbs)` <= 238 ~ "188 - 238",
+    `Weight (lbs)` >= 238.01 & `Weight (lbs)` <= 288 ~ "238 - 288"
+  ))
+
+```
+
+- Part 1: EDA
+  
+  - Distribution of BMI in the Data
+  
+```{r distribution, message=FALSE, warning=FALSE}
+# Generating the Distribution Plot
+ggplot(gym, aes(x = BMI)) + 
+  geom_histogram(aes(y = after_stat(density)),
+                 color = 1, fill = "white") +
+  geom_density(lwd = 1, color = 4,
+               fill = 4, alpha = 0.25)
+    
+
+```
+
+
+- Distribution of Duration in the Data
+
+```{r Workout Duration Distribution, message=FALSE, warning=FALSE}
+ggplot(gym, aes(x = `Session_Duration (mins)`)) +
+  geom_density(color = 4, fill = 4, lwd = 1, alpha = 0.7) +
+  labs( 
+    title = "Distribution of Session Duration (mins)",
+    x = "Session Duration (mins)"
+    ) +
+  theme_minimal()
+
+```
+
+
+- Part 2: How Can A New Gym Member Become Healthy Optimally?
+
+  - Looking to find the best formula for a new gym goer to follow:
+  
+    -   Weight loss optimization, what works best?
+    -   Optimal Duration, Workout Type, Water Intake, etc.
+    
+
+- What Workout Types are Optimal for Burning Calories?
+
+```{r optimal workouts, message=FALSE, warning=FALSE}
+
+# Get Summary data to display the average of calories burned for workout type
+averages <- gym %>%
+  group_by(Workout_Type) %>%
+  summarize(Average_Cal_Burned = mean(Calories_Burned))
+
+# Code to create lolipop chart that orders the workouts by higher calories burned
+lolipop <- ggplot(averages, aes(x = reorder(Workout_Type,-Average_Cal_Burned), y = Average_Cal_Burned)) +
+  geom_segment(aes(x = reorder(Workout_Type,-Average_Cal_Burned), 
+                   xend = reorder(Workout_Type,-Average_Cal_Burned), 
+                   y = 0, yend = Average_Cal_Burned), lwd = 1.5, color = 'Grey') +
+    # Creates the lolipop and changes text that pops up when hovering over the lolipops
+    # Also changes the color of the lolipop to correlate with workout type
+    geom_point(
+      aes(color = Workout_Type,
+          text = paste(
+          "Workout Type: ", Workout_Type,
+          "\nAverage Calories Burned: ", round(Average_Cal_Burned, 1)
+        )),
+        size = 5) +
+    labs(
+        title = "Average Calories Burned by Workout Type",
+        x = "",
+        y = "Average Calories Burned",
+        ) +
+        coord_flip() +
+        theme_minimal() +
+          theme(legend.position = "none")
+
+# Makes plot interactive
+lolipop <- ggplotly(lolipop, tooltip = "text")
+lolipop
+
+```
+
+
+- What is the Optimal Workout Duration?
+
+```{r Optimal Duration w. Workout, message=FALSE, warning=FALSE}
+
+# Add average session duration to the averages df
+averages <- gym %>%
+  group_by(Workout_Type) %>%
+  summarize(Average_Cal_Burned = mean(Calories_Burned),
+            Average_Session_Duration = mean(`Session_Duration (mins)`))
+
+# Generate Bar Plot of Workout Type and Average Session Duration
+bar1 <- ggplot(averages, aes(x = Workout_Type, y = Average_Session_Duration, 
+                             fill = Workout_Type)) +
+  geom_bar(stat = 'identity',
+           aes(text = paste("Workout Type: ", Workout_Type,
+                            "\nAverage Session Duration: ", round(Average_Session_Duration,1)))) +
+  labs(
+    title = "Average Session Duration by Workout Type",
+      x = "",
+      y = "Average Session Duration"
+      ) +
+        theme_minimal() +
+        theme(legend.position = 'none')
+
+# Make plot Interactive
+bar1 <- ggplotly(bar1, tooltip = "text")
+bar1
+
+
+```
+
+
+ - Pie Charts by Workout Experience
+ 
+```{r message=FALSE, warning=FALSE}
+
+# Create a new dataset for level 1 experience
+exp1 <- gym %>%
+  filter(Experience_Level == 1) %>%
+  count(Workout_Type) %>%
+  mutate(percentage = n / sum(n) * 100, # Calculate percentage
+         label = paste0(Workout_Type, "\n(", round(percentage, 1), "%)"))
+
+# Pie chart for Experience Level 1
+ggplot(exp1, aes(x = "", y = n, fill = Workout_Type)) +
+  geom_bar(stat = "identity", width = 1) +
+  coord_polar(theta = "y") +
+  geom_text(aes(label = label), position = position_stack(vjust = 0.5), size = 4) +
+  labs(title = "Workout Preferences for Experience Level 1",
+       x = NULL, y = NULL, fill = "Workout Type") +
+  theme_minimal() +
+  theme(axis.text = element_blank(),
+        axis.ticks = element_blank(),
+        panel.grid = element_blank())
+
+# Create a new dataset for experience level 2
+exp2 <- gym %>%
+  filter(Experience_Level == 2) %>%
+  count(Workout_Type) %>%
+  mutate(percentage = n / sum(n) * 100, # Calculate percentage
+         label = paste0(Workout_Type, "\n(", round(percentage, 1), "%)"))
+
+# Pie chart for Experience Level 2
+ggplot(exp2, aes(x = "", y = n, fill = Workout_Type)) +
+  geom_bar(stat = "identity", width = 1) +
+  coord_polar(theta = "y") +
+  geom_text(aes(label = label), position = position_stack(vjust = 0.5), size = 4) +
+  labs(title = "Workout Preferences for Experience Level 2",
+       x = NULL, y = NULL, fill = "Workout Type") +
+  theme_minimal() +
+  theme(axis.text = element_blank(),
+        axis.ticks = element_blank(),
+        panel.grid = element_blank())
+
+# Create a new dataset for experience level 3
+exp3 <- gym %>%
+  filter(Experience_Level == 3) %>%
+  count(Workout_Type) %>%
+  mutate(percentage = n / sum(n) * 100, # Calculate percentage
+         label = paste0(Workout_Type, "\n(", round(percentage, 1), "%)"))
+
+# Pie chart for Experience Level 3
+ggplot(exp3, aes(x = "", y = n, fill = Workout_Type)) +
+  geom_bar(stat = "identity", width = 1) +
+  coord_polar(theta = "y") +
+  geom_text(aes(label = label), position = position_stack(vjust = 0.5), size = 4) +
+  labs(title = "Workout Preferences for Experience Level 3",
+       x = NULL, y = NULL, fill = "Workout Type") +
+  theme_minimal() +
+  theme(axis.text = element_blank(),
+        axis.ticks = element_blank(),
+        panel.grid = element_blank())
+```
+
+- What is the Optimal Workout Frequency? 
+  
+```{r Optimal Frequency, message=FALSE, warning=FALSE}
+# Want to look at a lifter who has experience in the gym to see 
+# How many days a week they lift and compare to their BMI/Fat%
+# Pull in library for sake of comparison
+library(patchwork)
+
+# Group gym by experience 
+exp_level <- gym %>%
+  group_by(Experience_Level) %>%
+  select(BMI, `Workout_Frequency (days/week)`)
+
+
+#Set to a Factor so they will be grouped separately
+exp_level$Experience_Level <- as.factor(exp_level$Experience_Level)
+exp_level$`Workout_Frequency (days/week)` <- as.factor(exp_level$`Workout_Frequency (days/week)`)
+
+# Creating a violin plot to compare 
+violin1 <- ggplot(exp_level, aes(x = Experience_Level, y = BMI)) +
+  geom_violin(trim = FALSE, aes(fill = Experience_Level),alpha = 0.8) +
+  scale_color_gradient(low = "Blue", high = "Red") +
+    labs(
+      title = "Comparing Experience Level and Workout Frequency",
+      x = "Experience Level"
+    ) +
+  theme(legend.position = "FALSE")
+
+
+# Create a ridgeline plot for the sake of comparison
+bar1 <- ggplot(exp_level, aes(x = `Workout_Frequency (days/week)`, fill = Experience_Level)) +
+  geom_bar(alpha = 0.8, color = "Black") +
+  guides(fill = guide_legend(title = "Exeperience Level")) +
+  labs(
+    x = "Workout Frequency (Days per Week)",
+    y = "Count"
+  )  
+
+
+comparison <- violin1 + bar1
+
+comparison
+```
+
+
+- What is Optimal Water Intake?
+
+```{undefined message=FALSE, warning=FALSE}
+# making groups of intake levels
+p = gym %>%
+  mutate(Water_Group = cut(`Water_Intake (ounces)`, breaks = c(50, 75, 100, 125, Inf), 
+                           labels = c("Low (50 - 75)", "Medium (75 - 100)", 
+                                      "High (100 - 125)", "Very High (125+)"))) %>%
+  ggplot(aes(x = Water_Group, y = Fat_Percentage, fill = Water_Group)) +
+    geom_boxplot() +
+    labs(title = "Fat Percentage by Water Intake Group",
+       x = "Water Intake Group (Ounces)",
+       y = "Fat Percentage (%)") +
+  theme_minimal()
+
+p = ggplotly(p, tooltip = "text")
+p
+
+```
+
+
+
+
+
